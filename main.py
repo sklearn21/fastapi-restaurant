@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi import HTTPException # Add this to your imports at the top!
 
 app = FastAPI()
 
@@ -24,3 +25,13 @@ def get_menu():
 def add_dish(dish: Dish):
     menu_db.append(dish)
     return {"status": "Success", "added": dish}
+
+@app.get("/menu/{dish_name}")
+def get_dish(dish_name: str):
+    # Search the list for a dish with a matching name
+    for dish in menu_db:
+        if dish.name.lower() == dish_name.lower():
+            return dish
+    
+    # If not found, send a 404 Error
+    raise HTTPException(status_code=404, detail="Dish not found on our menu")
